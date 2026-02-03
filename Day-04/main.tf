@@ -15,9 +15,25 @@ terraform {
 # Create a S3 bucket
 resource "aws_s3_bucket" "tf_test_bucket" {
   bucket = "my-tf-test-bucket-1234567890-statefile"
-
   tags = {
     Name        = "My bucket"
     Environment = "Dev"
+  }
+}
+# Versioning for the S3 bucket
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.tf_test_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+# Enable server-side encryption for the S3 bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "sse" {
+  bucket = aws_s3_bucket.tf_test_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
   }
 }
