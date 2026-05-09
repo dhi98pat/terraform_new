@@ -9,6 +9,17 @@ locals {
     description = "Allow traffic on port ${port}"
   }]
   instance_size = lookup(var.instance_sizes, var.environment, "t2.micro")
+
+  all_location = concat(var.user_location, var.default_locations)
+  duplicate_location = toset(local.all_location)
+
+  postive_cost = [ for cost in var.monthly_costs: abs (cost) ]
+  max_cost = max(local.postive_cost...)
+  min_cost = min(local.postive_cost...)
+  total_cost = sum(local.postive_cost)
+  average_cost = local.total_cost / length(local.postive_cost)
+
+  current_time = timestamp()
 }
 
 resource "aws_s3_bucket" "first_bucket" {
